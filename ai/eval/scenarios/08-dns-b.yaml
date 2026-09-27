@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feeds
+  annotations:
+    k9sai.eval/expect: dns-network
+    k9sai.eval/wait: restarts>=2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: feeds
+  template:
+    metadata:
+      labels:
+        app: feeds
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: feeds
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - 'echo ''fetching upstream feed from 10.255.255.1:443''; wget -T 5 -q -O- http://10.255.255.1:443/feed || (echo ''error: dial tcp 10.255.255.1:443: i/o timeout''; exit 1)'

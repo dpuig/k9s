@@ -1,0 +1,47 @@
+# k9sai plugins. Merge into $XDG_CONFIG_HOME/k9s/plugins.yaml
+# (macOS default: ~/Library/Application Support/k9s/plugins.yaml), or run `make -C ai install`.
+#
+# All entries run in the foreground: k9s suspends, the answer streams into a pager,
+# and `q` returns to k9s. The command is exec'd directly (no shell), so $INPUT_QUERY
+# can never be interpreted by a shell -- keep it that way.
+plugins:
+  k9sai-diagnose:
+    shortCut: Shift-D
+    description: AI diagnose
+    scopes: [pods, deployments, statefulsets, daemonsets, replicasets]
+    command: k9sai
+    background: false
+    confirm: false
+    args: [diagnose, --context, $CONTEXT, --kubeconfig, $KUBECONFIG, -n, $NAMESPACE, --resource, $RESOURCE_NAME, $NAME]
+
+  k9sai-logs:
+    shortCut: Shift-L
+    description: AI log summary
+    scopes: [pods]
+    command: k9sai
+    background: false
+    confirm: false
+    args: [logs, --context, $CONTEXT, --kubeconfig, $KUBECONFIG, -n, $NAMESPACE, $NAME]
+
+  k9sai-logs-container:
+    shortCut: Shift-L
+    description: AI log summary
+    scopes: [containers]
+    command: k9sai
+    background: false
+    confirm: false
+    args: [logs, --context, $CONTEXT, --kubeconfig, $KUBECONFIG, -n, $NAMESPACE, --container, $NAME, $POD]
+
+  k9sai-ask:
+    shortCut: Shift-Q
+    description: AI ask (k9s syntax)
+    scopes: [all]
+    command: k9sai
+    background: false
+    confirm: false
+    inputs:
+      - name: query
+        label: Ask (e.g. pods in payments restarting)
+        type: string
+        required: true
+    args: [ask, --context, $CONTEXT, --kubeconfig, $KUBECONFIG, -n, $NAMESPACE, $INPUT_QUERY]

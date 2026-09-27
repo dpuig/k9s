@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache
+  annotations:
+    k9sai.eval/expect: oom
+    k9sai.eval/wait: restarts>=2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cache
+  template:
+    metadata:
+      labels:
+        app: cache
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: cache
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - echo warming cache; head -c 300m /dev/zero | tail
+        resources:
+          limits:
+            memory: 48Mi
+          requests:
+            memory: 48Mi
