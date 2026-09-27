@@ -18,7 +18,7 @@ from kubernetes.client import ApiException
 
 from k9sai import collect
 from k9sai.evidence import Evidence
-from k9sai.kube import Kube
+from k9sai.kube import Kube, read_log
 from k9sai.redact import redact_obj
 
 TOOL_NAMES = ("get_resource", "get_events", "get_logs", "get_node_conditions", "rbac_lookup")
@@ -88,9 +88,7 @@ def make_tools(k: Kube, ns: str, ev: Evidence, max_calls: int) -> list[Callable[
         """Returns the last `tail` log lines (max 300) of a container in the current
         namespace. previous=true reads the previous (crashed) instance."""
         return (
-            k.core.read_namespaced_pod_log(
-                pod, ns, container=container or None, previous=previous, tail_lines=min(tail, 300)
-            )
+            read_log(k, pod, ns, container=container or None, previous=previous, tail_lines=min(tail, 300))
             or "<empty>"
         )
 

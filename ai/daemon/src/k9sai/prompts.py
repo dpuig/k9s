@@ -47,7 +47,9 @@ Answer in exactly this markdown shape:
 </evidence>"""
 
 TOOLS_NOTE = """You may call the read-only tools at most {n} times in total, only if the
-evidence below is missing something you need. Tool results come back with new E# ids."""
+evidence below is missing something you need. Tool results come back with new E# ids.
+Call any tools FIRST, before writing anything. Once you write "## Summary", do not call
+tools and do not repeat the answer."""
 
 LOGS = """Summarize the logs of {target}. The evidence holds drain3 templates (C<id>), their
 counts and first/last times, plus a "new in last 10m" section.

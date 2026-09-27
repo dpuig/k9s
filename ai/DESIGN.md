@@ -1,6 +1,7 @@
 # k9sai — local AI for k9s
 
-Status: design agreed, not yet implemented.
+Status: Phase 1 implemented. See [README.md](README.md) for setup, and the "Implementation
+notes" section at the end of this document for where the build departs from the plan.
 Scope: a personal tool, developed in the `dpuig/k9s` fork. It is not intended for upstream.
 
 k9sai adds AI-assisted diagnosis, log summarization and syntax help to k9s. It works
@@ -250,3 +251,27 @@ in ≥ 70% of cases, and there are **zero** invented evidence citations.
   New top-level `ai/` and `cmd/k9sai/` directories keep rebase conflicts rare.
 - This document supersedes the earlier root-level `k9s-ai.md` proposal and its
   architecture PNG, which have been removed.
+
+## Implementation notes (Phase 1)
+
+These are the places where the build had to go further than the design, found during implementation:
+
+- **The SDK harness has its own builtin tools.** `.lightweight()` turns on `run_command`,
+  `view_file`, `create_file` and `edit_file`. The lockdown and its regression check are recorded in
+  [ADR-0001's addendum](docs/adr/0001-python-daemon-antigravity-sdk.md#addendum-implementation-2026-09-26-the-sdk-harness-ships-builtin-tools).
+- **Secrets are blocked at the transport, not just skipped.** The guard rejects any request
+  under `/api/v1/…/secrets` (including a list, which would return `data`), whatever the verb.
+- **The guard sits at the lowest client layer** (`RESTClientObject.request`), so typed APIs,
+  raw `call_api`, watches and logs all go through it. The tool call budget is enforced in our
+  wrapper too, because the SDK does not cap how many times the model calls a tool.
+- **Redaction handles multi-line env pairs.** In YAML, `- name: DB_PASSWORD` and
+  `value: …` sit on separate lines, so text is redacted *before* it is split into lines.
+  Structured objects returned by tools also get a key-aware pass (`redact_obj`).
+- **Each request carries `$KUBECONFIG`.** The daemon is long-lived, so it must use the
+  kubeconfig of the k9s session that called it, not whatever was set when the daemon started.
+- **Plugins exec `k9sai` directly, with no shell.** `$INPUT_QUERY` is substituted by k9s into a
+  single argv entry. The plugins must never be rewritten as `bash -c`.
+- **Unix socket paths are limited to 104 bytes on macOS.** The daemon checks the length and
+  fails with a clear message instead of an opaque `OSError`.
+- **Errors are shown in the pager.** k9s resumes as soon as a foreground plugin exits, so an
+  error printed to stderr would vanish.

@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 from kubernetes.client import ApiException
 
 from k9sai.evidence import Evidence
-from k9sai.kube import Kube
+from k9sai.kube import Kube, read_log
 
 LOG_TAIL = 60
 MAX_PODS = 3
@@ -167,7 +167,8 @@ def pod_logs(k: Kube, pod, tail: int = LOG_TAIL) -> list[tuple[str, list[str]]]:
         wanted.append(("current", False))
         for label, prev in wanted:
             try:
-                text = k.core.read_namespaced_pod_log(
+                text = read_log(
+                    k,
                     pod.metadata.name,
                     pod.metadata.namespace,
                     container=c.name,

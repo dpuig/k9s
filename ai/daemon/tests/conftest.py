@@ -73,6 +73,18 @@ def _pod(name="web-1"):
 
 ROUTES = [
     (
+        r"/api/v1/namespaces$",
+        "GET",
+        {"items": [{"metadata": {"name": "shop"}}, {"metadata": {"name": "payments"}}]},
+    ),
+    (
+        r"/api/v1$",
+        "GET",
+        {"resources": [{"name": "pods", "shortNames": ["po"]}, {"name": "pods/log"}, {"name": "services"}]},
+    ),
+    (r"/apis$", "GET", {"groups": [{"preferredVersion": {"groupVersion": "apps/v1"}}]}),
+    (r"/apis/apps/v1$", "GET", {"resources": [{"name": "deployments", "shortNames": ["deploy"]}]}),
+    (
         r"/api/v1/namespaces/shop/pods/web-1/log",
         "GET",
         "2026-09-26T19:59:00.123456789Z starting web\n2026-09-26T19:59:01Z allocating cache 900Mi\n",
@@ -168,6 +180,8 @@ ROUTES = [
 
 
 class _Resp:
+    """Stands in for urllib3.HTTPResponse."""
+
     def __init__(self, status, body):
         self.status, self.reason = status, "OK" if status == 200 else "Not Found"
         self.data = body.encode()
@@ -179,18 +193,22 @@ class _Resp:
     def getheader(self, name, default=None):
         return self.headers.get(name, default)
 
+    def release_conn(self):
+        pass
+
 
 class FakeCluster:
     def __init__(self):
         self.requests: list[tuple[str, str]] = []
 
-    def respond(self, method, url):
+    def respond(self, method, url, preload=True):
         path = urlsplit(url).path
         self.requests.append((method, path))
         for pattern, m, body in ROUTES:
             if m == method and re.search(pattern, path):
                 text = body if isinstance(body, str) else json.dumps(body)
-                return rest.RESTResponse(_Resp(200, text))
+                # Like the real client: raw urllib3 response unless preloading.
+                return rest.RESTResponse(_Resp(200, text)) if preload else _Resp(200, text)
         raise rest.ApiException(status=404, reason="Not Found")
 
 
@@ -198,8 +216,18 @@ class FakeCluster:
 def cluster(monkeypatch):
     fake = FakeCluster()
 
-    def request(self, method, url, query_params=None, *args, **kwargs):
-        return fake.respond(method, url)
+    def request(
+        self,
+        method,
+        url,
+        query_params=None,
+        headers=None,
+        body=None,
+        post_params=None,
+        _preload_content=True,
+        _request_timeout=None,
+    ):
+        return fake.respond(method, url, _preload_content)
 
     # Patch the *network* layer only; GuardedRESTClient.request still runs first.
     monkeypatch.setattr(rest.RESTClientObject, "request", request)

@@ -126,6 +126,7 @@ func TestDiagnoseRendersStream(t *testing.T) {
 	assert.Contains(t, s, "12 evidence lines")
 	assert.Contains(t, s, "dropped: logs: 3/9 lines")
 	assert.Contains(t, s, "[read-only tool: get_events]")
+	assert.NotContains(t, s, "was a draft") // tool call came before any answer text
 	assert.Contains(t, s, "OOMKilled [E4]")
 	assert.Contains(t, s, "E99")
 	assert.Equal(t, "kind", body.Context)
@@ -221,4 +222,18 @@ func TestEnsureDaemonReportsStartupFailure(t *testing.T) {
 	c := newClient("/tmp/k9sai-none/nope.sock")
 	err := c.ensureDaemon(context.Background())
 	require.ErrorContains(t, err, "config error: no config")
+}
+
+func TestDraftDividerWhenToolFollowsText(t *testing.T) {
+	var out bytes.Buffer
+	r := newRenderer(&out, &options{task: "diagnose"})
+	for _, ev := range []event{
+		{name: "token", data: []byte(`{"text":"## Summary draft"}`)},
+		{name: "tool", data: []byte(`{"name":"get_logs"}`)},
+		{name: "tool", data: []byte(`{"name":"get_events"}`)},
+		{name: "token", data: []byte(`{"text":"## Summary final"}`)},
+	} {
+		require.NoError(t, r.handle(ev))
+	}
+	assert.Equal(t, 1, strings.Count(out.String(), "was a draft"))
 }

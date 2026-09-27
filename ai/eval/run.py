@@ -45,7 +45,12 @@ def ensure_cluster(name: str) -> str:
     clusters = subprocess.run(["kind", "get", "clusters"], capture_output=True, text=True).stdout.split()
     if name not in clusters:
         print(f"creating kind cluster {name} ...", flush=True)
+        previous = subprocess.run(
+            ["kubectl", "config", "current-context"], capture_output=True, text=True
+        ).stdout.strip()
         subprocess.run(["kind", "create", "cluster", "--name", name, "--wait", "90s"], check=True)
+        if previous:  # kind switches current-context; leave the user's kubeconfig as it was
+            subprocess.run(["kubectl", "config", "use-context", previous], check=True)
     return f"kind-{name}"
 
 

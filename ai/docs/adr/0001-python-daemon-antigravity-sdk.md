@@ -41,3 +41,26 @@ Building the tool loop and policy engine ourselves in Go would duplicate that wo
 - The SDK docs don't promise tool calling on local models. We mitigate this by
   pre-gathering evidence instead of depending on tool calls.
 - LiteRT with Gemma 26B needs ≥ 24 GB of memory. The idle exit releases it when the tool is unused.
+
+## Addendum (implementation, 2026-09-26): the SDK harness ships builtin tools
+
+The SDK runs a separate native binary (`localharness`, ~118 MB) that executes tools and calls
+the model. That harness has **builtin tools**: `run_command`, `view_file`, `create_file`,
+`edit_file`, `read_url_content`, `search_web`, subagents and more. `.lightweight()`, which the
+SDK docs recommend for local models, **enables `run_command`, `view_file`, `create_file` and
+`edit_file` by default**. The original proposal's sketch (`.lightweight()` plus custom
+policies) would have given a prompt-injectable model a shell, and access to
+`~/.kube/config`, that bypasses our Kubernetes guard entirely.
+
+`k9sai.backend.build_config` is therefore the only place an agent config is built. It:
+
+- passes `CapabilitiesConfig(enabled_tools=[], enable_subagents=False)` and `workspaces=[]`;
+- sets `policies=[deny("*"), allow(<our tool>)...]` as a second layer;
+- re-checks `enabled_tools == []` *after* `.lightweight()` presets are applied, and raises
+  `UnsafeConfigError` otherwise, so an SDK upgrade that changes preset semantics fails loudly.
+  A unit test simulates exactly that regression.
+
+We verified this against Ollama in a live test. Asked to call `run_command` and `view_file`, the model
+got "unknown tool" from the harness, and no file was written. During the same run, the harness
+made loopback connections only (to the Python process and to Ollama on `:11434`).
+`k9sai-daemon check-config` runs the lockdown check for every configured backend.

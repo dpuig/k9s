@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 
 from kubernetes import client, config
@@ -36,8 +37,30 @@ def connect(context: str | None, kubeconfig: str | None = None) -> Kube:
 
 
 def get_json(k: Kube, path: str) -> dict:
-    """GET an arbitrary API path (discovery, owner lookups) through the guard."""
-    data, _, _ = k.api.call_api(
-        path, "GET", response_type="object", auth_settings=["BearerToken"], _return_http_data_only=False
+    """GET an arbitrary API path (discovery) through the guard, parsed as JSON.
+
+    Raw response + json.loads: the generated deserializer's call_api signature
+    changes between client majors, the wire format does not.
+    """
+    resp = k.api.call_api(
+        path, "GET", auth_settings=["BearerToken"], _preload_content=False, _return_http_data_only=True
     )
-    return data or {}
+    try:
+        return json.loads(resp.data or b"{}")
+    finally:
+        if hasattr(resp, "release_conn"):
+            resp.release_conn()
+
+
+def read_log(k: Kube, pod: str, ns: str, **kwargs) -> str:
+    """Pod logs as text.
+
+    The generated client deserializes this endpoint into the repr of a bytes object
+    (``"b'line1\\nline2'"``), so read the raw response and decode it ourselves.
+    """
+    resp = k.core.read_namespaced_pod_log(pod, ns, _preload_content=False, **kwargs)
+    try:
+        return resp.data.decode("utf-8", errors="replace")
+    finally:
+        if hasattr(resp, "release_conn"):
+            resp.release_conn()

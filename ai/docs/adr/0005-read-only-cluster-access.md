@@ -26,6 +26,9 @@ Two Phase 2 features need API calls that change nothing but are not `get`/`list`
 - **Two named exceptions**, each with a precondition the guard enforces:
   - `PATCH`/`PUT` is allowed only when `dryRun=All` is set.
   - `create` is allowed only for `subjectaccessreviews` in `authorization.k8s.io`.
+- **Secrets are never fetched.** The guard rejects every request under the `secrets`
+  resource path, whatever the verb, so "Secret `data` is never read" is enforced at the transport,
+  not left to each caller.
 - **Exceptions are for our own code only.** They are never registered as model tools, so no
   prompt can reach them.
 - **Guard test.** CI fails if any registered tool can reach a verb outside the allowlist, or

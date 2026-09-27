@@ -26,6 +26,8 @@ const (
 type renderer struct {
 	w    io.Writer
 	opts *options
+	// drafted is set when answer text was streamed since the last tool call.
+	drafted bool
 }
 
 func newRenderer(w io.Writer, opts *options) *renderer {
@@ -43,11 +45,19 @@ func (r *renderer) handle(ev event) error {
 	case "meta":
 		err = r.header(d)
 	case "token":
+		r.drafted = r.drafted || strings.TrimSpace(str("text")) != ""
 		_, err = io.WriteString(r.w, str("text"))
 	case "thought":
 		_, err = fmt.Fprint(r.w, dim+str("text")+reset)
 	case "tool":
-		_, err = fmt.Fprintf(r.w, "\n%s[read-only tool: %s]%s\n", dim, str("name"), reset)
+		// Text already in the pager can't be erased; say plainly that it was a draft.
+		if r.drafted {
+			_, err = fmt.Fprintf(r.w, "\n\n%s── the text above was a draft; the model is fetching more evidence and will revise ──%s\n", dim, reset)
+			r.drafted = false
+		}
+		if err == nil {
+			_, err = fmt.Fprintf(r.w, "\n%s[read-only tool: %s]%s\n", dim, str("name"), reset)
+		}
 	case "footer":
 		_, err = io.WriteString(r.w, str("text"))
 	case evError:

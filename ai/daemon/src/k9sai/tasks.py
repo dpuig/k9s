@@ -17,7 +17,7 @@ from k9sai import citations, collect, drainlogs, prompts
 from k9sai.backend import AgentBackend
 from k9sai.config import Backend, Config
 from k9sai.evidence import Evidence
-from k9sai.kube import Kube, get_json
+from k9sai.kube import Kube, get_json, read_log
 from k9sai.tools import make_tools
 
 Stream = AsyncIterator[tuple[str, dict]]
@@ -61,7 +61,18 @@ def parse_hypotheses(text: str) -> list[dict]:
 
 
 def _target(r: Request) -> str:
+    if r.task == "ask":
+        return f"{r.question!r} (namespace {r.namespace})"
     return f"{r.resource}/{r.name} in namespace {r.namespace}"
+
+
+TURN_BREAK = "\x00turn\x00"
+
+
+def final_turn(out: list[str]) -> str:
+    """Text of the last turn that produced any; earlier turns were drafts before tool calls."""
+    turns = [t for t in "".join(out).split(TURN_BREAK) if t.strip()]
+    return turns[-1] if turns else ""
 
 
 async def _generate(
@@ -75,6 +86,7 @@ async def _generate(
         elif e.kind == "thought" and r.thoughts:
             yield "thought", {"text": e.text}
         elif e.kind == "tool":
+            out.append(TURN_BREAK)  # text before a tool call was a draft
             yield "tool", {"name": e.text}
 
 
@@ -112,14 +124,15 @@ async def diagnose(deps: Deps, r: Request) -> Stream:
     started = time.monotonic()
     async for item in _generate(deps, r, backend, prompt, tools, ev, out):
         yield item
-    text = "".join(out)
+    # Citations are checked over everything shown, drafts included; grading uses the final turn.
+    text = "".join(out).replace(TURN_BREAK, "\n")
     if f := citations.footer(text, ev.ids):
         yield "footer", {"text": f}
     if r.json:
         yield (
             "result",
             {
-                "hypotheses": parse_hypotheses(text),
+                "hypotheses": parse_hypotheses(final_turn(out)),
                 "invalid_citations": citations.invalid(text, ev.ids),
                 "evidence_ids": len(ev.ids),
                 "seconds": round(time.monotonic() - started, 1),
@@ -151,7 +164,8 @@ def _log_lines(k: Kube, r: Request) -> tuple[str, list[str]]:
     container = r.container or (pod.metadata.annotations or {}).get(
         "kubectl.kubernetes.io/default-container", names[0]
     )
-    text = k.core.read_namespaced_pod_log(
+    text = read_log(
+        k,
         r.name,
         r.namespace,
         container=container,
@@ -172,7 +186,7 @@ async def logs(deps: Deps, r: Request) -> Stream:
     out: list[str] = []
     async for item in _generate(deps, r, backend, prompts.logs(target, ev.render()), [], ev, out):
         yield item
-    if f := citations.footer("".join(out), ev.ids):
+    if f := citations.footer("".join(out).replace(TURN_BREAK, "\n"), ev.ids):
         yield "footer", {"text": f}
 
 
@@ -218,7 +232,7 @@ async def ask(deps: Deps, r: Request) -> Stream:
     out: list[str] = []
     async for item in _generate(deps, r, backend, prompt, [], Evidence(), out):
         yield item
-    m = _COMMAND.search("".join(out))
+    m = _COMMAND.search(final_turn(out))
     yield "result", {"command": m.group(1).strip() if m else ""}
 
 

@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import re
 import stat
 import tempfile
 from datetime import datetime, timezone
@@ -56,6 +57,18 @@ async def test_diagnose_end_to_end(cluster):
     assert [h["category"] for h in result["hypotheses"]] == ["oom", "app-crash"]
     assert result["invalid_citations"] == [999]
     assert {m for m, _ in cluster.requests} == {"GET"}
+
+
+async def test_logs_are_real_lines_not_bytes_repr(cluster):
+    """Regression: the generated client returns "b'...'" for the log endpoint."""
+    stub = StubBackend("## Summary\nx")
+    r = Request(task="diagnose", namespace="shop", resource="pods", name="web-1")
+    await collect(tasks.diagnose(deps(cluster, stub), r))
+    prompt = stub.prompts[0]
+    assert "b'" not in prompt and "\\n" not in prompt
+    assert re.search(r"E\d+: 2026-09-26T19:59:01Z allocating cache 900Mi", prompt) or re.search(
+        r"E\d+: allocating cache 900Mi", prompt
+    )
 
 
 async def test_diagnose_deployment_finds_failing_pods(cluster):
@@ -139,3 +152,27 @@ async def test_server_streams_over_unix_socket(cluster):
 def test_socket_path_length_is_checked(tmp_path):
     with pytest.raises(SystemExit, match="too long"):
         server._prepare_socket(tmp_path / ("x" * 120) / "d.sock")
+
+
+def test_final_turn_ignores_drafts_before_tool_calls():
+    out = [
+        "## Hypotheses\n1. **Draft** (category: other",
+        tasks.TURN_BREAK,
+        "   ",
+        tasks.TURN_BREAK,
+        "## Hypotheses\n1. **Final** (category: oom, confidence: high)",
+    ]
+    assert [h["category"] for h in tasks.parse_hypotheses(tasks.final_turn(out))] == ["oom"]
+    assert tasks.final_turn([]) == ""
+
+
+async def test_ask_grounds_prompt_in_cluster_facts(cluster):
+    stub = StubBackend("COMMAND: `:pods payments /web`\nWHY: pods in payments named web")
+    r = Request(task="ask", namespace="shop", question="web pods in payments")
+    events = await collect(tasks.ask(deps(cluster, stub), r))
+    prompt = stub.prompts[0]
+    assert "namespaces: payments, shop" in prompt
+    assert "deployments(deploy)" in prompt and "pods(po)" in prompt and "pods/log" not in prompt
+    assert "label keys in shop: app" in prompt
+    assert dict(events)["result"] == {"command": ":pods payments /web"}
+    assert {m for m, _ in cluster.requests} == {"GET"}
