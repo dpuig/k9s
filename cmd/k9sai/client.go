@@ -27,7 +27,7 @@ const (
 	logTailLines       = 15
 )
 
-var knownTasks = map[string]bool{"diagnose": true, "logs": true, "ask": true, taskCapture: true}
+var knownTasks = map[string]bool{taskDiagnose: true, taskLogs: true, taskAsk: true, taskCapture: true}
 
 type client struct {
 	socket string

@@ -63,7 +63,7 @@ func (r *renderer) handle(ev event) error {
 	case evError:
 		_, err = fmt.Fprintf(r.w, "\n%sk9sai error: %s%s\n", red, str("message"), reset)
 	case evResult:
-		if cmd := str("command"); r.opts.task == "ask" {
+		if cmd := str("command"); r.opts.task == taskAsk {
 			err = r.askResult(cmd)
 		}
 	}

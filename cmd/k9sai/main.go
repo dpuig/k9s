@@ -32,9 +32,12 @@ common flags: --context C  -n NAMESPACE  --kubeconfig PATH  --no-pager  --socket
 `
 
 const (
-	taskCapture = "capture"
-	evResult    = "result"
-	evError     = "error"
+	taskDiagnose = "diagnose"
+	taskLogs     = "logs"
+	taskAsk      = "ask"
+	taskCapture  = "capture"
+	evResult     = "result"
+	evError      = "error"
 )
 
 // request mirrors k9sai.tasks.Request in the daemon.
@@ -140,18 +143,18 @@ func parseArgs(args []string) (*options, error) {
 
 	switch opts.task {
 	case "status":
-	case "diagnose", "logs", taskCapture:
+	case taskDiagnose, taskLogs, taskCapture:
 		if len(rest) != 1 || rest[0] == "" {
 			return nil, fmt.Errorf("%s needs exactly one resource name", opts.task)
 		}
 		opts.req.Name = rest[0]
-		if opts.task == "logs" {
+		if opts.task == taskLogs {
 			opts.req.Resource = "pods"
 		}
 		if opts.task == taskCapture && opts.out == "" {
 			return nil, errors.New("capture needs -o FILE")
 		}
-	case "ask":
+	case taskAsk:
 		opts.req.Question = strings.TrimSpace(strings.Join(rest, " "))
 		if opts.req.Question == "" {
 			return nil, errors.New("ask needs a question")
