@@ -1,0 +1,103 @@
+{
+ "target": {
+  "context": "kind-k9sai-eval",
+  "namespace": "eval-10-rbac-b",
+  "resource": "deployments",
+  "name": "config-watcher"
+ },
+ "captured_at": "2026-09-27T01:52:05.581131+00:00",
+ "evidence": {
+  "sections": [
+   {
+    "title": "Deployment config-watcher",
+    "keep": "head",
+    "lines": [
+     "Deployment config-watcher selector=app=config-watcher pods=1 failing=1"
+    ]
+   },
+   {
+    "title": "events Deployment config-watcher",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:18Z Normal ScalingReplicaSet x1: Scaled up replica set config-watcher-fd7b8bc84 from 0 to 1"
+    ]
+   },
+   {
+    "title": "describe pod config-watcher-fd7b8bc84-tq8mr",
+    "keep": "head",
+    "lines": [
+     "Pod eval-10-rbac-b/config-watcher-fd7b8bc84-tq8mr phase=Running node=k9sai-eval-control-plane qos=BestEffort created=2026-09-27T01:51:18Z",
+     "Condition PodReadyToStartContainers=True",
+     "Condition Initialized=True",
+     "Condition Ready=False reason=ContainersNotReady message=containers with unready status: [config-watcher]",
+     "Condition ContainersReady=False reason=ContainersNotReady message=containers with unready status: [config-watcher]",
+     "Condition PodScheduled=True",
+     "container config-watcher image=curlimages/curl:8.10.1 ready=False restarts=3",
+     "  resources: requests[-] limits[-]",
+     "  state: Terminated reason=Error exitCode=1 started=2026-09-27T01:51:54Z finished=2026-09-27T01:51:54Z message=",
+     "  lastState: Terminated reason=Error exitCode=1 started=2026-09-27T01:51:32Z finished=2026-09-27T01:51:32Z message=",
+     "  command: sh -c echo 'listing configmaps via the API'; NS=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace); curl -sfk -H \"Authorization: [REDACTED] [REDACTED] /var/run/secrets/kubernetes.io/serviceaccount/token)\" https://kubernetes.default.svc/api/v1/namespaces/$NS/configmaps -o /tmp/out || (curl -sk -H \"Authorization: [REDACTED] [REDACTED] /var/run/secrets/kubernetes.io/serviceaccount/token)\" https://kubernetes.default.svc/api/v1/namespaces/$NS/configmaps; exit 1)"
+    ]
+   },
+   {
+    "title": "events pod config-watcher-fd7b8bc84-tq8mr",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:18Z Normal Scheduled x1: Successfully assigned eval-10-rbac-b/config-watcher-fd7b8bc84-tq8mr to k9sai-eval-control-plane",
+     "2026-09-27T01:51:53Z Normal Pulled x4: Container image \"curlimages/curl:8.10.1\" already present on machine and can be accessed by the pod",
+     "2026-09-27T01:51:53Z Normal Created x4: Container created",
+     "2026-09-27T01:51:54Z Normal Started x4: Container started",
+     "2026-09-27T01:51:54Z Warning BackOff x3: Back-off restarting failed container config-watcher in pod config-watcher-fd7b8bc84-tq8mr_eval-10-rbac-b(212faed3-3f80-40dd-8fe5-683e674d4d8d)"
+    ]
+   },
+   {
+    "title": "logs config-watcher (previous) [config-watcher-fd7b8bc84-tq8mr]",
+    "keep": "tail",
+    "lines": [
+     "unable to retrieve container logs for containerd://a302c0594908c46e68b38fa8a57a65a383c7d340b12207ce0a7c1ed2196f4c93"
+    ]
+   },
+   {
+    "title": "logs config-watcher (current) [config-watcher-fd7b8bc84-tq8mr]",
+    "keep": "tail",
+    "lines": [
+     "listing configmaps via the API",
+     "{",
+     "  \"kind\": \"Status\",",
+     "  \"apiVersion\": \"v1\",",
+     "  \"metadata\": {},",
+     "  \"status\": \"Failure\",",
+     "  \"message\": \"configmaps is forbidden: User \\\"system:serviceaccount:eval-10-rbac-b:config-watcher\\\" cannot list resource \\\"configmaps\\\" in API group \\\"\\\" in the namespace \\\"eval-10-rbac-b\\\"\",",
+     "  \"reason\": \"Forbidden\",",
+     "  \"details\": {",
+     "    \"kind\": \"configmaps\"",
+     "  },",
+     "  \"code\": 403",
+     "}"
+    ]
+   },
+   {
+    "title": "owner chain",
+    "keep": "head",
+    "lines": [
+     "ReplicaSet config-watcher-fd7b8bc84 revision=1 replicas=1 ready=0 available=0 images=curlimages/curl:8.10.1 created=2026-09-27T01:51:18Z",
+     "Deployment config-watcher revision=1 replicas=1 ready=0 available=0 images=curlimages/curl:8.10.1 created=2026-09-27T01:51:17Z",
+     "  Deployment condition Available=False reason=MinimumReplicasUnavailable message=Deployment does not have minimum availability.",
+     "  Deployment condition Progressing=True reason=ReplicaSetUpdated message=ReplicaSet \"config-watcher-fd7b8bc84\" is progressing."
+    ]
+   },
+   {
+    "title": "node k9sai-eval-control-plane",
+    "keep": "head",
+    "lines": [
+     "Node k9sai-eval-control-plane allocatable cpu=16 memory=8125656Ki",
+     "  condition Ready=True reason=KubeletReady message=kubelet is posting ready status"
+    ]
+   }
+  ]
+ },
+ "scenario": "10-rbac-b",
+ "expect": [
+  "rbac"
+ ]
+}

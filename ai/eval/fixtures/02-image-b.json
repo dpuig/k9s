@@ -1,0 +1,83 @@
+{
+ "target": {
+  "context": "kind-k9sai-eval",
+  "namespace": "eval-02-image-b",
+  "resource": "deployments",
+  "name": "worker"
+ },
+ "captured_at": "2026-09-27T01:52:05.315854+00:00",
+ "evidence": {
+  "sections": [
+   {
+    "title": "Deployment worker",
+    "keep": "head",
+    "lines": [
+     "Deployment worker selector=app=worker pods=1 failing=1"
+    ]
+   },
+   {
+    "title": "events Deployment worker",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:16Z Normal ScalingReplicaSet x1: Scaled up replica set worker-5fc65bfff4 from 0 to 1"
+    ]
+   },
+   {
+    "title": "describe pod worker-5fc65bfff4-mj2wg",
+    "keep": "head",
+    "lines": [
+     "Pod eval-02-image-b/worker-5fc65bfff4-mj2wg phase=Pending node=k9sai-eval-control-plane qos=BestEffort created=2026-09-27T01:51:16Z",
+     "Condition PodReadyToStartContainers=True",
+     "Condition Initialized=True",
+     "Condition Ready=False reason=ContainersNotReady message=containers with unready status: [worker]",
+     "Condition ContainersReady=False reason=ContainersNotReady message=containers with unready status: [worker]",
+     "Condition PodScheduled=True",
+     "container worker image=registry.invalid/shop/worker:2.1.0 ready=False restarts=0",
+     "  resources: requests[-] limits[-]",
+     "  state: Waiting reason=ImagePullBackOff message=Back-off pulling image \"registry.invalid/shop/worker:2.1.0\": ErrImagePull: failed to pull and unpack image \"registry.invalid/shop/worker:2.1.0\": failed to resolve reference \"registry.invalid/shop/worker:2.1.0\": failed to do request: Head \"https://registry.invalid/v2/shop/worker/manifests/2.1.0\": dial tcp: lookup registry.invalid on 192.168.65.254:53: no such host"
+    ]
+   },
+   {
+    "title": "events pod worker-5fc65bfff4-mj2wg",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:16Z Normal Scheduled x1: Successfully assigned eval-02-image-b/worker-5fc65bfff4-mj2wg to k9sai-eval-control-plane",
+     "2026-09-27T01:51:41Z Normal BackOff x2: Back-off pulling image \"registry.invalid/shop/worker:2.1.0\"",
+     "2026-09-27T01:51:41Z Warning Failed x2: Error: ImagePullBackOff",
+     "2026-09-27T01:51:53Z Normal Pulling x3: Pulling image \"registry.invalid/shop/worker:2.1.0\"",
+     "2026-09-27T01:51:53Z Warning Failed x3: Failed to pull image \"registry.invalid/shop/worker:2.1.0\": failed to pull and unpack image \"registry.invalid/shop/worker:2.1.0\": failed to resolve reference \"registry.invalid/shop/worker:2.1.0\": failed to do request: Head \"https://registry.invalid/v2/shop/worker/manifests/2.1.0\": dial tcp: lookup registry.invalid on 192.168.65.254:53: no such host",
+     "2026-09-27T01:51:53Z Warning Failed x3: Error: ErrImagePull"
+    ]
+   },
+   {
+    "title": "logs worker (current) [worker-5fc65bfff4-mj2wg]",
+    "keep": "tail",
+    "lines": [
+     "logs unavailable: Bad Request"
+    ]
+   },
+   {
+    "title": "owner chain",
+    "keep": "head",
+    "lines": [
+     "ReplicaSet worker-5fc65bfff4 revision=1 replicas=1 ready=0 available=0 images=registry.invalid/shop/worker:2.1.0 created=2026-09-27T01:51:16Z",
+     "Deployment worker revision=1 replicas=1 ready=0 available=0 images=registry.invalid/shop/worker:2.1.0 created=2026-09-27T01:51:16Z",
+     "  Deployment condition Available=False reason=MinimumReplicasUnavailable message=Deployment does not have minimum availability.",
+     "  Deployment condition Progressing=True reason=ReplicaSetUpdated message=ReplicaSet \"worker-5fc65bfff4\" is progressing."
+    ]
+   },
+   {
+    "title": "node k9sai-eval-control-plane",
+    "keep": "head",
+    "lines": [
+     "Node k9sai-eval-control-plane allocatable cpu=16 memory=8125656Ki",
+     "  condition Ready=True reason=KubeletReady message=kubelet is posting ready status"
+    ]
+   }
+  ]
+ },
+ "scenario": "02-image-b",
+ "expect": [
+  "image-pull"
+ ]
+}

@@ -1,0 +1,84 @@
+{
+ "target": {
+  "context": "kind-k9sai-eval",
+  "namespace": "eval-02-image-a",
+  "resource": "deployments",
+  "name": "api"
+ },
+ "captured_at": "2026-09-27T01:52:05.298327+00:00",
+ "evidence": {
+  "sections": [
+   {
+    "title": "Deployment api",
+    "keep": "head",
+    "lines": [
+     "Deployment api selector=app=api pods=1 failing=1"
+    ]
+   },
+   {
+    "title": "events Deployment api",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:15Z Normal ScalingReplicaSet x1: Scaled up replica set api-79868d4b6f from 0 to 1"
+    ]
+   },
+   {
+    "title": "describe pod api-79868d4b6f-stwqs",
+    "keep": "head",
+    "lines": [
+     "Pod eval-02-image-a/api-79868d4b6f-stwqs phase=Pending node=k9sai-eval-control-plane qos=BestEffort created=2026-09-27T01:51:16Z",
+     "Condition PodReadyToStartContainers=True",
+     "Condition Initialized=True",
+     "Condition Ready=False reason=ContainersNotReady message=containers with unready status: [api]",
+     "Condition ContainersReady=False reason=ContainersNotReady message=containers with unready status: [api]",
+     "Condition PodScheduled=True",
+     "container api image=busybox:does-not-exist-k9sai ready=False restarts=0",
+     "  resources: requests[-] limits[-]",
+     "  state: Waiting reason=ImagePullBackOff message=Back-off pulling image \"busybox:does-not-exist-k9sai\": ErrImagePull: rpc error: code = NotFound desc = failed to pull and unpack image \"docker.io/library/busybox:does-not-exist-k9sai\": failed to resolve reference \"docker.io/library/busybox:does-not-exist-k9sai\": docker.io/library/busybox:does-not-exist-k9sai: not found",
+     "  command: sleep 3600"
+    ]
+   },
+   {
+    "title": "events pod api-79868d4b6f-stwqs",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:16Z Normal Scheduled x1: Successfully assigned eval-02-image-a/api-79868d4b6f-stwqs to k9sai-eval-control-plane",
+     "2026-09-27T01:51:40Z Normal BackOff x2: Back-off pulling image \"busybox:does-not-exist-k9sai\"",
+     "2026-09-27T01:51:40Z Warning Failed x2: Error: ImagePullBackOff",
+     "2026-09-27T01:51:54Z Normal Pulling x3: Pulling image \"busybox:does-not-exist-k9sai\"",
+     "2026-09-27T01:51:55Z Warning Failed x3: Failed to pull image \"busybox:does-not-exist-k9sai\": rpc error: code = NotFound desc = failed to pull and unpack image \"docker.io/library/busybox:does-not-exist-k9sai\": failed to resolve reference \"docker.io/library/busybox:does-not-exist-k9sai\": docker.io/library/busybox:does-not-exist-k9sai: not found",
+     "2026-09-27T01:51:55Z Warning Failed x3: Error: ErrImagePull"
+    ]
+   },
+   {
+    "title": "logs api (current) [api-79868d4b6f-stwqs]",
+    "keep": "tail",
+    "lines": [
+     "logs unavailable: Bad Request"
+    ]
+   },
+   {
+    "title": "owner chain",
+    "keep": "head",
+    "lines": [
+     "ReplicaSet api-79868d4b6f revision=1 replicas=1 ready=0 available=0 images=busybox:does-not-exist-k9sai created=2026-09-27T01:51:15Z",
+     "Deployment api revision=1 replicas=1 ready=0 available=0 images=busybox:does-not-exist-k9sai created=2026-09-27T01:51:15Z",
+     "  Deployment condition Available=False reason=MinimumReplicasUnavailable message=Deployment does not have minimum availability.",
+     "  Deployment condition Progressing=True reason=ReplicaSetUpdated message=ReplicaSet \"api-79868d4b6f\" is progressing."
+    ]
+   },
+   {
+    "title": "node k9sai-eval-control-plane",
+    "keep": "head",
+    "lines": [
+     "Node k9sai-eval-control-plane allocatable cpu=16 memory=8125656Ki",
+     "  condition Ready=True reason=KubeletReady message=kubelet is posting ready status"
+    ]
+   }
+  ]
+ },
+ "scenario": "02-image-a",
+ "expect": [
+  "image-pull"
+ ]
+}

@@ -1,0 +1,646 @@
+[
+ {
+  "id": "02-image-a",
+  "mode": "no-tools",
+  "expect": [
+   "image-pull"
+  ],
+  "categories": [
+   "image-pull",
+   "missing-config"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.5,
+  "error": null
+ },
+ {
+  "id": "02-image-a",
+  "mode": "tools",
+  "expect": [
+   "image-pull"
+  ],
+  "categories": [
+   "image-pull",
+   "image-pull"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 11.7,
+  "error": null
+ },
+ {
+  "id": "02-image-b",
+  "mode": "no-tools",
+  "expect": [
+   "image-pull"
+  ],
+  "categories": [
+   "image-pull",
+   "image-pull"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.6,
+  "error": null
+ },
+ {
+  "id": "02-image-b",
+  "mode": "tools",
+  "expect": [
+   "image-pull"
+  ],
+  "categories": [
+   "image-pull",
+   "image-pull"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 10.3,
+  "error": null
+ },
+ {
+  "id": "03-config-a",
+  "mode": "no-tools",
+  "expect": [
+   "missing-config"
+  ],
+  "categories": [
+   "missing-config",
+   "bad-env-or-args"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.2,
+  "error": null
+ },
+ {
+  "id": "03-config-a",
+  "mode": "tools",
+  "expect": [
+   "missing-config"
+  ],
+  "categories": [
+   "missing-config",
+   "missing-config"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 9.2,
+  "error": null
+ },
+ {
+  "id": "03-config-b",
+  "mode": "no-tools",
+  "expect": [
+   "missing-config"
+  ],
+  "categories": [
+   "missing-config",
+   "missing-config"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.2,
+  "error": null
+ },
+ {
+  "id": "03-config-b",
+  "mode": "tools",
+  "expect": [
+   "missing-config"
+  ],
+  "categories": [
+   "missing-config",
+   "bad-env-or-args"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 9.6,
+  "error": null
+ },
+ {
+  "id": "05-sched-a",
+  "mode": "no-tools",
+  "expect": [
+   "unschedulable"
+  ],
+  "categories": [
+   "unschedulable",
+   "other"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 3.5,
+  "error": null
+ },
+ {
+  "id": "05-sched-a",
+  "mode": "tools",
+  "expect": [
+   "unschedulable"
+  ],
+  "categories": [
+   "unschedulable",
+   "bad-env-or-args"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 9.9,
+  "error": null
+ },
+ {
+  "id": "05-sched-b",
+  "mode": "no-tools",
+  "expect": [
+   "unschedulable"
+  ],
+  "categories": [
+   "unschedulable",
+   "node-problem"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 3.7,
+  "error": null
+ },
+ {
+  "id": "05-sched-b",
+  "mode": "tools",
+  "expect": [
+   "unschedulable"
+  ],
+  "categories": [
+   "unschedulable",
+   "node-problem"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 12.0,
+  "error": null
+ },
+ {
+  "id": "09-storage-a",
+  "mode": "no-tools",
+  "expect": [
+   "storage"
+  ],
+  "categories": [
+   "storage",
+   "storage"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.2,
+  "error": null
+ },
+ {
+  "id": "09-storage-a",
+  "mode": "tools",
+  "expect": [
+   "storage"
+  ],
+  "categories": [
+   "storage",
+   "storage"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 8.6,
+  "error": null
+ },
+ {
+  "id": "09-storage-b",
+  "mode": "no-tools",
+  "expect": [
+   "storage"
+  ],
+  "categories": [
+   "storage",
+   "storage"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.5,
+  "error": null
+ },
+ {
+  "id": "09-storage-b",
+  "mode": "tools",
+  "expect": [
+   "storage"
+  ],
+  "categories": [
+   "storage",
+   "storage"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 12.2,
+  "error": null
+ },
+ {
+  "id": "07-env-b",
+  "mode": "no-tools",
+  "expect": [
+   "bad-env-or-args"
+  ],
+  "categories": [
+   "image-pull",
+   "bad-env-or-args"
+  ],
+  "top1": false,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.7,
+  "error": null
+ },
+ {
+  "id": "07-env-b",
+  "mode": "tools",
+  "expect": [
+   "bad-env-or-args"
+  ],
+  "categories": [
+   "image-pull",
+   "bad-env-or-args"
+  ],
+  "top1": false,
+  "top2": true,
+  "invalid": [],
+  "seconds": 18.8,
+  "error": null
+ },
+ {
+  "id": "01-oom-a",
+  "mode": "no-tools",
+  "expect": [
+   "oom"
+  ],
+  "categories": [
+   "oom",
+   "oom"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 5.3,
+  "error": null
+ },
+ {
+  "id": "01-oom-a",
+  "mode": "tools",
+  "expect": [
+   "oom"
+  ],
+  "categories": [
+   "oom",
+   "other"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 14.0,
+  "error": null
+ },
+ {
+  "id": "04-probe-a",
+  "mode": "no-tools",
+  "expect": [
+   "probe-failure"
+  ],
+  "categories": [
+   "app-crash",
+   "probe-failure"
+  ],
+  "top1": false,
+  "top2": true,
+  "invalid": [],
+  "seconds": 6.7,
+  "error": null
+ },
+ {
+  "id": "04-probe-a",
+  "mode": "tools",
+  "expect": [
+   "probe-failure"
+  ],
+  "categories": [
+   "probe-failure",
+   "app-crash"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 14.2,
+  "error": null
+ },
+ {
+  "id": "06-crash-a",
+  "mode": "no-tools",
+  "expect": [
+   "app-crash"
+  ],
+  "categories": [
+   "app-crash",
+   "bad-env-or-args"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.3,
+  "error": null
+ },
+ {
+  "id": "06-crash-a",
+  "mode": "tools",
+  "expect": [
+   "app-crash"
+  ],
+  "categories": [
+   "app-crash",
+   "bad-env-or-args"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 5.4,
+  "error": null
+ },
+ {
+  "id": "06-crash-b",
+  "mode": "no-tools",
+  "expect": [
+   "app-crash",
+   "bad-env-or-args"
+  ],
+  "categories": [
+   "app-crash",
+   "image-pull"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 3.7,
+  "error": null
+ },
+ {
+  "id": "06-crash-b",
+  "mode": "tools",
+  "expect": [
+   "app-crash",
+   "bad-env-or-args"
+  ],
+  "categories": [
+   "app-crash",
+   "bad-env-or-args"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 14.7,
+  "error": null
+ },
+ {
+  "id": "07-env-a",
+  "mode": "no-tools",
+  "expect": [
+   "bad-env-or-args",
+   "missing-config"
+  ],
+  "categories": [
+   "bad-env-or-args",
+   "image-pull"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 3.9,
+  "error": null
+ },
+ {
+  "id": "07-env-a",
+  "mode": "tools",
+  "expect": [
+   "bad-env-or-args",
+   "missing-config"
+  ],
+  "categories": [
+   "missing-config",
+   "bad-env-or-args"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 11.8,
+  "error": null
+ },
+ {
+  "id": "08-dns-a",
+  "mode": "no-tools",
+  "expect": [
+   "dns-network"
+  ],
+  "categories": [
+   "dns-network",
+   "dns-network"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.9,
+  "error": null
+ },
+ {
+  "id": "08-dns-a",
+  "mode": "tools",
+  "expect": [
+   "dns-network"
+  ],
+  "categories": [
+   "dns-network",
+   "dns-network"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 15.5,
+  "error": null
+ },
+ {
+  "id": "10-rbac-a",
+  "mode": "no-tools",
+  "expect": [
+   "rbac"
+  ],
+  "categories": [
+   "rbac",
+   "image-pull"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 5.0,
+  "error": null
+ },
+ {
+  "id": "10-rbac-a",
+  "mode": "tools",
+  "expect": [
+   "rbac"
+  ],
+  "categories": [
+   "rbac",
+   "app-crash"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 16.6,
+  "error": null
+ },
+ {
+  "id": "10-rbac-b",
+  "mode": "no-tools",
+  "expect": [
+   "rbac"
+  ],
+  "categories": [
+   "rbac",
+   "image-pull"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.3,
+  "error": null
+ },
+ {
+  "id": "10-rbac-b",
+  "mode": "tools",
+  "expect": [
+   "rbac"
+  ],
+  "categories": [
+   "rbac",
+   "image-pull"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 17.1,
+  "error": null
+ },
+ {
+  "id": "01-oom-b",
+  "mode": "no-tools",
+  "expect": [
+   "oom"
+  ],
+  "categories": [
+   "oom",
+   "oom"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.3,
+  "error": null
+ },
+ {
+  "id": "01-oom-b",
+  "mode": "tools",
+  "expect": [
+   "oom"
+  ],
+  "categories": [
+   "oom",
+   "oom"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 14.1,
+  "error": null
+ },
+ {
+  "id": "08-dns-b",
+  "mode": "no-tools",
+  "expect": [
+   "dns-network"
+  ],
+  "categories": [
+   "dns-network",
+   "app-crash"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 5.7,
+  "error": null
+ },
+ {
+  "id": "08-dns-b",
+  "mode": "tools",
+  "expect": [
+   "dns-network"
+  ],
+  "categories": [
+   "dns-network",
+   "dns-network"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 15.5,
+  "error": null
+ },
+ {
+  "id": "04-probe-b",
+  "mode": "no-tools",
+  "expect": [
+   "probe-failure"
+  ],
+  "categories": [
+   "probe-failure",
+   "app-crash"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 4.0,
+  "error": null
+ },
+ {
+  "id": "04-probe-b",
+  "mode": "tools",
+  "expect": [
+   "probe-failure"
+  ],
+  "categories": [
+   "probe-failure",
+   "probe-failure"
+  ],
+  "top1": true,
+  "top2": true,
+  "invalid": [],
+  "seconds": 14.0,
+  "error": null
+ }
+]
