@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: config-watcher
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-watcher
+  annotations:
+    k9sai.eval/expect: rbac
+    k9sai.eval/wait: restarts>=2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-watcher
+  template:
+    metadata:
+      labels:
+        app: config-watcher
+    spec:
+      terminationGracePeriodSeconds: 1
+      serviceAccountName: config-watcher
+      containers:
+      - name: config-watcher
+        image: curlimages/curl:8.10.1
+        command:
+        - sh
+        - -c
+        - 'echo ''listing configmaps via the API''; NS=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace); curl -sfk -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+          https://kubernetes.default.svc/api/v1/namespaces/$NS/configmaps -o /tmp/out || (curl -sk -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" https://kubernetes.default.svc/api/v1/namespaces/$NS/configmaps;
+          exit 1)'

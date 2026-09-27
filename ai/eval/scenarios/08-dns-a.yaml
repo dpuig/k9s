@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync
+  annotations:
+    k9sai.eval/expect: dns-network
+    k9sai.eval/wait: restarts>=2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sync
+  template:
+    metadata:
+      labels:
+        app: sync
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: sync
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - 'echo ''resolving inventory.shop-backend.svc.cluster.local''; nslookup inventory.shop-backend.svc.cluster.local || (echo ''error: could not resolve host inventory.shop-backend.svc.cluster.local'';
+          exit 1)'

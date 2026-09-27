@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifier
+  annotations:
+    k9sai.eval/expect: bad-env-or-args,missing-config
+    k9sai.eval/wait: restarts>=2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifier
+  template:
+    metadata:
+      labels:
+        app: notifier
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: notifier
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - 'if [ -z "$SMTP_HOST" ]; then echo ''fatal: required environment variable SMTP_HOST is not set''; exit 64; fi; sleep 3600'
+        env:
+        - name: SMTP_PORT
+          value: '587'

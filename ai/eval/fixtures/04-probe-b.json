@@ -1,0 +1,84 @@
+{
+ "target": {
+  "context": "kind-k9sai-eval",
+  "namespace": "eval-04-probe-b",
+  "resource": "deployments",
+  "name": "search"
+ },
+ "captured_at": "2026-09-27T01:52:05.635901+00:00",
+ "evidence": {
+  "sections": [
+   {
+    "title": "Deployment search",
+    "keep": "head",
+    "lines": [
+     "Deployment search selector=app=search pods=1 failing=1"
+    ]
+   },
+   {
+    "title": "events Deployment search",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:16Z Normal ScalingReplicaSet x1: Scaled up replica set search-7c669585bf from 0 to 1"
+    ]
+   },
+   {
+    "title": "describe pod search-7c669585bf-9s76x",
+    "keep": "head",
+    "lines": [
+     "Pod eval-04-probe-b/search-7c669585bf-9s76x phase=Running node=k9sai-eval-control-plane qos=BestEffort created=2026-09-27T01:51:16Z",
+     "Condition PodReadyToStartContainers=True",
+     "Condition Initialized=True",
+     "Condition Ready=False reason=ContainersNotReady message=containers with unready status: [search]",
+     "Condition ContainersReady=False reason=ContainersNotReady message=containers with unready status: [search]",
+     "Condition PodScheduled=True",
+     "container search image=busybox:1.36 ready=False restarts=0",
+     "  resources: requests[-] limits[-]",
+     "  state: Running since 2026-09-27T01:51:16Z",
+     "  readiness: exec sh -c test -f /tmp/index-ready delay=0s period=3s timeout=1s failureThreshold=3",
+     "  command: sh -c echo search node started; sleep 3600"
+    ]
+   },
+   {
+    "title": "events pod search-7c669585bf-9s76x",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:16Z Normal Scheduled x1: Successfully assigned eval-04-probe-b/search-7c669585bf-9s76x to k9sai-eval-control-plane",
+     "2026-09-27T01:51:16Z Normal Pulled x1: Container image \"busybox:1.36\" already present on machine and can be accessed by the pod",
+     "2026-09-27T01:51:16Z Normal Created x1: Container created",
+     "2026-09-27T01:51:16Z Normal Started x1: Container started",
+     "2026-09-27T01:52:03Z Warning Unhealthy x17: Readiness probe failed: "
+    ]
+   },
+   {
+    "title": "logs search (current) [search-7c669585bf-9s76x]",
+    "keep": "tail",
+    "lines": [
+     "search node started"
+    ]
+   },
+   {
+    "title": "owner chain",
+    "keep": "head",
+    "lines": [
+     "ReplicaSet search-7c669585bf revision=1 replicas=1 ready=0 available=0 images=busybox:1.36 created=2026-09-27T01:51:16Z",
+     "Deployment search revision=1 replicas=1 ready=0 available=0 images=busybox:1.36 created=2026-09-27T01:51:16Z",
+     "  Deployment condition Available=False reason=MinimumReplicasUnavailable message=Deployment does not have minimum availability.",
+     "  Deployment condition Progressing=True reason=ReplicaSetUpdated message=ReplicaSet \"search-7c669585bf\" is progressing."
+    ]
+   },
+   {
+    "title": "node k9sai-eval-control-plane",
+    "keep": "head",
+    "lines": [
+     "Node k9sai-eval-control-plane allocatable cpu=16 memory=8125656Ki",
+     "  condition Ready=True reason=KubeletReady message=kubelet is posting ready status"
+    ]
+   }
+  ]
+ },
+ "scenario": "04-probe-b",
+ "expect": [
+  "probe-failure"
+ ]
+}

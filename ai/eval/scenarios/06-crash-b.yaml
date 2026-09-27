@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ledger
+  annotations:
+    k9sai.eval/expect: app-crash,bad-env-or-args
+    k9sai.eval/wait: restarts>=2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ledger
+  template:
+    metadata:
+      labels:
+        app: ledger
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: ledger
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - 'echo ''ledger: loading schema v12''; echo ''ERROR migration 0042_add_currency failed: column "currency" already exists''; exit 1'

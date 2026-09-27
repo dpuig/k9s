@@ -1,0 +1,88 @@
+{
+ "target": {
+  "context": "kind-k9sai-eval",
+  "namespace": "eval-01-oom-b",
+  "resource": "statefulsets",
+  "name": "indexer"
+ },
+ "captured_at": "2026-09-27T01:52:05.599258+00:00",
+ "evidence": {
+  "sections": [
+   {
+    "title": "StatefulSet indexer",
+    "keep": "head",
+    "lines": [
+     "StatefulSet indexer selector=app=indexer pods=1 failing=1"
+    ]
+   },
+   {
+    "title": "events StatefulSet indexer",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:15Z Normal SuccessfulCreate x1: Create Pod indexer-0 in StatefulSet indexer successful"
+    ]
+   },
+   {
+    "title": "describe pod indexer-0",
+    "keep": "head",
+    "lines": [
+     "Pod eval-01-oom-b/indexer-0 phase=Running node=k9sai-eval-control-plane qos=Burstable created=2026-09-27T01:51:15Z",
+     "Condition PodReadyToStartContainers=True",
+     "Condition Initialized=True",
+     "Condition Ready=False reason=ContainersNotReady message=containers with unready status: [indexer]",
+     "Condition ContainersReady=False reason=ContainersNotReady message=containers with unready status: [indexer]",
+     "Condition PodScheduled=True",
+     "container indexer image=busybox:1.36 ready=False restarts=2",
+     "  resources: requests[memory=64Mi] limits[memory=64Mi]",
+     "  state: Terminated reason=OOMKilled exitCode=137 started=2026-09-27T01:51:37Z finished=2026-09-27T01:51:40Z message=",
+     "  lastState: Terminated reason=OOMKilled exitCode=137 started=2026-09-27T01:51:20Z finished=2026-09-27T01:51:23Z message=",
+     "  command: sh -c echo building index; sleep 3; head -c 500m /dev/zero | tail"
+    ]
+   },
+   {
+    "title": "events pod indexer-0",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:15Z Normal Scheduled x1: Successfully assigned eval-01-oom-b/indexer-0 to k9sai-eval-control-plane",
+     "2026-09-27T01:51:36Z Normal Pulled x3: Container image \"busybox:1.36\" already present on machine and can be accessed by the pod",
+     "2026-09-27T01:51:36Z Normal Created x3: Container created",
+     "2026-09-27T01:51:37Z Normal Started x3: Container started",
+     "2026-09-27T01:51:40Z Warning BackOff x2: Back-off restarting failed container indexer in pod indexer-0_eval-01-oom-b(b16703cb-bd17-40ae-829e-b107507c4eda)"
+    ]
+   },
+   {
+    "title": "logs indexer (previous) [indexer-0]",
+    "keep": "tail",
+    "lines": [
+     "unable to retrieve container logs for containerd://0497371be494e38c473497eb61bfb47169889573d186f41e8b1cf7cdececafdc"
+    ]
+   },
+   {
+    "title": "logs indexer (current) [indexer-0]",
+    "keep": "tail",
+    "lines": [
+     "building index"
+    ]
+   },
+   {
+    "title": "owner chain",
+    "keep": "head",
+    "lines": [
+     "StatefulSet indexer revision=- replicas=1 ready=0 available=0 images=busybox:1.36 created=2026-09-27T01:51:15Z"
+    ]
+   },
+   {
+    "title": "node k9sai-eval-control-plane",
+    "keep": "head",
+    "lines": [
+     "Node k9sai-eval-control-plane allocatable cpu=16 memory=8125656Ki",
+     "  condition Ready=True reason=KubeletReady message=kubelet is posting ready status"
+    ]
+   }
+  ]
+ },
+ "scenario": "01-oom-b",
+ "expect": [
+  "oom"
+ ]
+}

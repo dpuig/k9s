@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search
+  annotations:
+    k9sai.eval/expect: probe-failure
+    k9sai.eval/wait: notready=45s
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search
+  template:
+    metadata:
+      labels:
+        app: search
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: search
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - echo search node started; sleep 3600
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - test -f /tmp/index-ready
+          periodSeconds: 3

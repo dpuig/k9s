@@ -1,0 +1,70 @@
+{
+ "target": {
+  "context": "kind-k9sai-eval",
+  "namespace": "eval-09-storage-b",
+  "resource": "deployments",
+  "name": "media"
+ },
+ "captured_at": "2026-09-27T01:52:05.406344+00:00",
+ "evidence": {
+  "sections": [
+   {
+    "title": "Deployment media",
+    "keep": "head",
+    "lines": [
+     "Deployment media selector=app=media pods=1 failing=1"
+    ]
+   },
+   {
+    "title": "events Deployment media",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:17Z Normal ScalingReplicaSet x1: Scaled up replica set media-55887bb7c8 from 0 to 1"
+    ]
+   },
+   {
+    "title": "describe pod media-55887bb7c8-lv7vr",
+    "keep": "head",
+    "lines": [
+     "Pod eval-09-storage-b/media-55887bb7c8-lv7vr phase=Pending node=<unscheduled> qos=BestEffort created=2026-09-27T01:51:18Z",
+     "container media image=busybox:1.36",
+     "  resources: requests[-] limits[-]",
+     "  command: sleep 3600",
+     "volume data <- pvc media-shared"
+    ]
+   },
+   {
+    "title": "pvcs pod media-55887bb7c8-lv7vr",
+    "keep": "head",
+    "lines": [
+     "PVC media-shared phase=Pending storageClass=standard request={'storage': '1Gi'}",
+     "  2026-09-27T01:51:17Z Normal WaitForFirstConsumer x1: waiting for first consumer to be created before binding",
+     "  2026-09-27T01:51:55Z Normal ExternalProvisioning x5: Waiting for a volume to be created either by the external provisioner 'rancher.io/local-path' or manually by the system administrator. If volume creation is delayed, please verify that the provisioner is running and correctly registered.",
+     "  2026-09-27T01:52:03Z Normal Provisioning x3: External provisioner is provisioning volume for claim \"eval-09-storage-b/media-shared\"",
+     "  2026-09-27T01:52:03Z Warning ProvisioningFailed x3: failed to provision volume with StorageClass \"standard\": NodePath only supports ReadWriteOnce and ReadWriteOncePod (1.22+) access modes"
+    ]
+   },
+   {
+    "title": "logs media (current) [media-55887bb7c8-lv7vr]",
+    "keep": "tail",
+    "lines": [
+     "<empty>"
+    ]
+   },
+   {
+    "title": "owner chain",
+    "keep": "head",
+    "lines": [
+     "ReplicaSet media-55887bb7c8 revision=1 replicas=1 ready=0 available=0 images=busybox:1.36 created=2026-09-27T01:51:17Z",
+     "Deployment media revision=1 replicas=1 ready=0 available=0 images=busybox:1.36 created=2026-09-27T01:51:17Z",
+     "  Deployment condition Available=False reason=MinimumReplicasUnavailable message=Deployment does not have minimum availability.",
+     "  Deployment condition Progressing=True reason=ReplicaSetUpdated message=ReplicaSet \"media-55887bb7c8\" is progressing."
+    ]
+   }
+  ]
+ },
+ "scenario": "09-storage-b",
+ "expect": [
+  "storage"
+ ]
+}

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  annotations:
+    k9sai.eval/expect: app-crash
+    k9sai.eval/wait: restarts>=2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: orders
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - 'echo ''orders service v3.2 starting''; sleep 2; echo ''panic: runtime error: invalid memory address or nil pointer dereference''; echo ''goroutine 1 [running]:''; echo ''main.(*OrderStore).Load(0x0)'';
+          exit 2'

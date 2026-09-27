@@ -1,0 +1,75 @@
+{
+ "target": {
+  "context": "kind-k9sai-eval",
+  "namespace": "eval-09-storage-a",
+  "resource": "deployments",
+  "name": "uploads"
+ },
+ "captured_at": "2026-09-27T01:52:05.390856+00:00",
+ "evidence": {
+  "sections": [
+   {
+    "title": "Deployment uploads",
+    "keep": "head",
+    "lines": [
+     "Deployment uploads selector=app=uploads pods=1 failing=1"
+    ]
+   },
+   {
+    "title": "events Deployment uploads",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:17Z Normal ScalingReplicaSet x1: Scaled up replica set uploads-7d6dd788c from 0 to 1"
+    ]
+   },
+   {
+    "title": "describe pod uploads-7d6dd788c-nltxk",
+    "keep": "head",
+    "lines": [
+     "Pod eval-09-storage-a/uploads-7d6dd788c-nltxk phase=Pending node=<unscheduled> qos=BestEffort created=2026-09-27T01:51:17Z",
+     "Condition PodScheduled=False reason=Unschedulable message=0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims. not found",
+     "container uploads image=busybox:1.36",
+     "  resources: requests[-] limits[-]",
+     "  command: sleep 3600",
+     "volume data <- pvc uploads-data"
+    ]
+   },
+   {
+    "title": "events pod uploads-7d6dd788c-nltxk",
+    "keep": "head",
+    "lines": [
+     "2026-09-27T01:51:17Z Warning FailedScheduling x1: 0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims. not found"
+    ]
+   },
+   {
+    "title": "pvcs pod uploads-7d6dd788c-nltxk",
+    "keep": "head",
+    "lines": [
+     "PVC uploads-data phase=Pending storageClass=fast-ssd request={'storage': '1Gi'}",
+     "  2026-09-27T01:51:55Z Warning ProvisioningFailed x4: storageclass.storage.k8s.io \"fast-ssd\" not found"
+    ]
+   },
+   {
+    "title": "logs uploads (current) [uploads-7d6dd788c-nltxk]",
+    "keep": "tail",
+    "lines": [
+     "<empty>"
+    ]
+   },
+   {
+    "title": "owner chain",
+    "keep": "head",
+    "lines": [
+     "ReplicaSet uploads-7d6dd788c revision=1 replicas=1 ready=0 available=0 images=busybox:1.36 created=2026-09-27T01:51:17Z",
+     "Deployment uploads revision=1 replicas=1 ready=0 available=0 images=busybox:1.36 created=2026-09-27T01:51:17Z",
+     "  Deployment condition Available=False reason=MinimumReplicasUnavailable message=Deployment does not have minimum availability.",
+     "  Deployment condition Progressing=True reason=ReplicaSetUpdated message=ReplicaSet \"uploads-7d6dd788c\" is progressing."
+    ]
+   }
+  ]
+ },
+ "scenario": "09-storage-a",
+ "expect": [
+  "storage"
+ ]
+}

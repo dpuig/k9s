@@ -26,3 +26,8 @@ kind
 /stresser
 __debug_bin*
 fg.yaml
+# k9sai daemon virtualenv
+ai/daemon/.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

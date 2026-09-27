@@ -1,0 +1,34 @@
+name: k9sai
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths: [ "ai/**", "cmd/k9sai/**", ".github/workflows/ai.yml" ]
+  push:
+    branches: [ master ]
+    paths: [ "ai/**", "cmd/k9sai/**", ".github/workflows/ai.yml" ]
+
+# Unit tests only: redaction, K8s guard, SDK lockdown, citations, drain, fixture
+# replay against a stub model. The graded eval needs a real model and runs locally
+# (`make -C ai eval`); its reports are committed under ai/eval/reports/.
+jobs:
+  daemon:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7.0.1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.13"
+
+      - name: Lint
+        working-directory: ai
+        run: |
+          uv --project daemon run ruff check --config daemon/pyproject.toml daemon/src daemon/tests eval
+          uv --project daemon run ruff format --config daemon/pyproject.toml --check daemon/src daemon/tests eval
+
+      - name: Test
+        working-directory: ai
+        run: uv --project daemon run pytest -q daemon/tests

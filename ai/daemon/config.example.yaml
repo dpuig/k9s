@@ -1,0 +1,24 @@
+# Copy to $XDG_CONFIG_HOME/k9sai/config.yaml (default ~/.config/k9sai/config.yaml).
+# See ai/DESIGN.md "Backends and routing".
+
+default: ollama
+backends:
+  ollama:
+    type: openai                          # any OpenAI-compatible server
+    base_url: http://localhost:11434/v1
+    model: qwen3-coder:30b
+  # gemma-local:
+  #   type: litert                        # in-process; needs >= 24 GB memory
+  #   model_path: ~/models/gemma-4-26b-a4b.litertlm
+
+tasks:                                    # task -> backend; unset tasks use `default`
+  ask: ollama
+  logs: ollama
+  diagnose: ollama
+
+# Non-loopback base_urls are refused unless listed here (ADR-0004).
+allow_endpoints: []
+
+budget_tokens: 6000                       # evidence budget per request
+max_tool_calls: 3                         # follow-up read-only tool calls per diagnosis
+idle_minutes: 30                          # daemon exits after this long with no requests
